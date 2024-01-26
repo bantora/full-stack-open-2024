@@ -4,11 +4,11 @@ import Total from "./Total";
 
 const App = () => {
   const course = {
-    title: "Half Stack application development",
+    name: "Half Stack application development",
     parts: [
-      { title: "Fundamentals of React", exercise: 10 },
-      { title: "Using props to pass data", exercise: 7 },
-      { title: "State of a component", exercise: 14 },
+      { name: "Fundamentals of React", exercise: 10 },
+      { name: "Using props to pass data", exercise: 7 },
+      { name: "State of a component", exercise: 14 },
     ],
   };
 
