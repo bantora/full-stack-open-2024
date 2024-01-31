@@ -1,38 +1,21 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+
+import { getPersons, postPersons, putPersons } from "./services/Persons";
 
 import Filter from "./Filter ";
 import PersonForm from "./PersonForm";
 import Persons from "./Persons";
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", number: "040-123456", id: 1 },
-    { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
-    { name: "Dan Abramov", number: "12-43-234345", id: 3 },
-    { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
-  ]);
+  const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [number, setNumber] = useState("");
   const [shownFilter, setShownFilter] = useState("");
+  const [triggerRender, setTriggerRender] = useState(false);
 
-  const list = shownFilter
-    ? persons
-        .filter(({ name }) => name.toLocaleLowerCase().includes(shownFilter))
-        .map(({ name, number, id }) => (
-          <div key={id}>
-            <div>
-              {name} {number}
-            </div>
-          </div>
-        ))
-    : persons.map(({ name, number, id }) => (
-        <div key={id}>
-          <div>
-            {name} {number}
-          </div>
-        </div>
-      ));
+  const handleRender = () => {
+    setTriggerRender(!triggerRender);
+  };
 
   const handleControlled = (e, setter) => {
     setter(e.target.value);
@@ -44,14 +27,30 @@ const App = () => {
     const checkPhonebook = persons.find(({ name }) => name === newName);
 
     if (!checkPhonebook)
-      setPersons([...persons, { name: newName, number: number }]);
+      postPersons({ name: newName, number }).then((res) => {
+        setNewName("");
+        setNumber("");
+        handleRender();
+        console.log(res);
+      });
 
-    if (checkPhonebook) alert(`${newName} is already in the phonebook`);
+    console.log(!checkPhonebook);
+
+    if (
+      checkPhonebook &&
+      confirm(
+        `${newName} is already added to phonebook, replace the old number with a new one?`
+      )
+    )
+      putPersons({ ...checkPhonebook, number }).then((res) => {
+        console.log(res);
+        handleRender();
+      });
   };
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((res) => console.log(res));
-  }, []);
+    getPersons().then((res) => setPersons(res));
+  }, [triggerRender]);
 
   return (
     <div>
@@ -75,7 +74,11 @@ const App = () => {
 
       <h3>Numbers</h3>
 
-      <Persons list={list} />
+      <Persons
+        persons={persons}
+        shownFilter={shownFilter}
+        handleRender={handleRender}
+      />
     </div>
   );
 };
