@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { getPersons, postPersons, putPersons } from "./services/Persons";
 
+import Notification from "./Notification";
 import Filter from "./Filter ";
 import PersonForm from "./PersonForm";
 import Persons from "./Persons";
@@ -12,6 +13,11 @@ const App = () => {
   const [number, setNumber] = useState("");
   const [shownFilter, setShownFilter] = useState("");
   const [triggerRender, setTriggerRender] = useState(false);
+  const [notifText, setNotifText] = useState("");
+  const [notifStyle, setNotifStyle] = useState({
+    color: "green",
+    visibility: "hidden",
+  });
 
   const handleRender = () => {
     setTriggerRender(!triggerRender);
@@ -19,6 +25,12 @@ const App = () => {
 
   const handleControlled = (e, setter) => {
     setter(e.target.value);
+  };
+
+  const handleNotification = (color) => {
+    setNotifStyle({ color, visibility: "visible" });
+
+    setTimeout(() => setNotifStyle({ color, visibility: "hidden" }), 5000);
   };
 
   const handleForm = (e) => {
@@ -30,7 +42,9 @@ const App = () => {
       postPersons({ name: newName, number }).then((res) => {
         setNewName("");
         setNumber("");
+        handleNotification("green");
         handleRender();
+        setNotifText(`Added ${res.name}`);
         console.log(res);
       });
 
@@ -44,6 +58,7 @@ const App = () => {
     )
       putPersons({ ...checkPhonebook, number }).then((res) => {
         console.log(res);
+        handleNotification("green");
         handleRender();
       });
   };
@@ -55,6 +70,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification notifText={notifText} {...notifStyle} />
       <Filter
         shownFilter={shownFilter}
         handleControlled={handleControlled}
@@ -78,6 +94,8 @@ const App = () => {
         persons={persons}
         shownFilter={shownFilter}
         handleRender={handleRender}
+        handleNotification={handleNotification}
+        setNotifText={setNotifText}
       />
     </div>
   );
