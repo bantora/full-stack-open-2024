@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 import Filter from "./Filter ";
 import PersonForm from "./PersonForm";
@@ -47,6 +48,10 @@ const App = () => {
 
     if (checkPhonebook) alert(`${newName} is already in the phonebook`);
   };
+
+  useEffect(() => {
+    axios.get("http://localhost:3001/persons").then((res) => console.log(res));
+  }, []);
 
   return (
     <div>
